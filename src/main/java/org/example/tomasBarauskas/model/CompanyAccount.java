@@ -1,18 +1,12 @@
 package org.example.tomasBarauskas.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class CompanyAccount {
+public class CompanyAccount implements Serializable {
     private BigDecimal companyAccount = new BigDecimal(0);
 
     public CompanyAccount() {
-    }
-
-    @Override
-    public String toString() {
-        return "CompanyAccount{" +
-                "companyAccount=" + companyAccount +
-                '}';
     }
 
     public BigDecimal getCompanyAccount() {
@@ -21,5 +15,10 @@ public class CompanyAccount {
 
     public void setCompanyAccount(BigDecimal companyAccount) {
         this.companyAccount = companyAccount;
+    }
+
+    @Override
+    public String toString() {
+        return "Imones saskaitos balansas: " + companyAccount;
     }
 }

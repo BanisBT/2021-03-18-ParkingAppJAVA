@@ -1,28 +1,58 @@
 package org.example.tomasBarauskas.service.parkingZoneDbManager;
 
 import org.example.tomasBarauskas.model.parking.ParkingZone;
+import org.example.tomasBarauskas.util.FileRW;
+import org.example.tomasBarauskas.util.ParkingZoneFileRW;
 
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParkingZoneDbImpl implements ParkingZoneDb{
+public class ParkingZoneDbImpl implements ParkingZoneDb {
+    private static final String PATH_ZONE_DB = "/Users/Gabi/IdeaProjects/2021-03-10/2021-03-19-ParkingAppDarbas/src/main/java/org/example/tomasBarauskas/file/ParkingZoneDatabase.ser";
+
+    private FileRW zoneFileRW = new ParkingZoneFileRW();
     private List<ParkingZone> parkingZoneList = new ArrayList<>();
 
     public ParkingZoneDbImpl() {
+        try {
+            parkingZoneList = zoneFileRW.getDetailsFromFile1(PATH_ZONE_DB);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public List<ParkingZone> getParkingZoneList() {
-        parkingZoneList.clear();
-
-        parkingZoneList.add(ParkingZone.VILNIUS_GREEN_ZONE);
-        parkingZoneList.add(ParkingZone.VILNIUS_BLUE_ZONE);
-        parkingZoneList.add(ParkingZone.VILNIUS_RED_ZONE);
-        parkingZoneList.add(ParkingZone.KAUNAS_BLUE_ZONE);
-        parkingZoneList.add(ParkingZone.KAUNAS_GREEN_ZONE);
-        parkingZoneList.add(ParkingZone.KAUNAS_RED_ZONE);
-        parkingZoneList.add(ParkingZone.KLAIPEDA_GREEN_ZONE);
-        parkingZoneList.add(ParkingZone.KLAIPEDA_RED_ZONE);
-
+    public List<ParkingZone> getParkingZoneList(){
+        try {
+            parkingZoneList = zoneFileRW.getDetailsFromFile1(PATH_ZONE_DB);
+        } catch (IOException e) {
+            System.out.println("Klaida");
+        }
         return parkingZoneList;
+    }
+
+    @Override
+    public void changeZoneCostPerHour(int zoneNumber, float newPrice){
+        parkingZoneList = getParkingZoneList();
+        BigDecimal zonePricePerHourNewBidDecimal = BigDecimal.valueOf(newPrice);
+        parkingZoneList.get(zoneNumber).setCostPerHour(zonePricePerHourNewBidDecimal);
+        writeZoneToDb(parkingZoneList);
+    }
+
+    @Override
+    public void changeZoneFineAmount(int zoneNumber, float newFineAmount) {
+        parkingZoneList = getParkingZoneList();
+        BigDecimal zoneFineAmountNewBigD = BigDecimal.valueOf(newFineAmount);
+        parkingZoneList.get(zoneNumber).setFine(zoneFineAmountNewBigD);
+        writeZoneToDb(parkingZoneList);
+    }
+
+    private void writeZoneToDb(List zoneList){
+        try {
+            zoneFileRW.writeObjectDetailsToFile(PATH_ZONE_DB, zoneList);
+        } catch (IOException e) {
+            System.out.println("Klaida");
+        }
     }
 }

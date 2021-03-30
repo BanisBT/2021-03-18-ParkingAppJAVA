@@ -1,24 +1,25 @@
 package org.example.tomasBarauskas.model.user;
 
-public class User {
-    private String userId;
-    private String password;
-    private String name;
-    private String surname;
-    private UserRole role;
+import org.example.tomasBarauskas.model.parking.parkingRecord.ParkingFine;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+
+public class User implements Serializable {
+    private final String userId;
+    private final String password;
+    private final String name;
+    private final String surname;
+    private UserRole role = UserRole.REGULAR_ROLE;
+    private String carNumber = "xxx 999";
+    private BigDecimal count = new BigDecimal(0);
+    private ParkingFine parkingFine;
 
     public User(String userId, String password, String name, String surname) {
         this.userId = userId;
         this.password = password;
         this.name = name;
         this.surname = surname;
-        this.role = UserRole.REGULAR_ROLE;
-    }
-
-    @Override
-    public String toString() {
-        return "Vartotojas - ID | Vardas | Pavarde" + '\n' +
-                userId + " | " + name + " | " + surname + '\n';
     }
 
     public String getUserId() {
@@ -33,7 +34,37 @@ public class User {
         return role;
     }
 
+    public BigDecimal getCount() {
+        return count;
+    }
+
+    public String getCarNumber() {
+        return carNumber;
+    }
+
     public void setRole(UserRole role) {
         this.role = role;
+    }
+
+    public void setCarNumber(String carNumber) {
+        this.carNumber = carNumber;
+    }
+
+    public void setCount(BigDecimal count) {
+        this.count = count;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId='" + userId + '\'' +
+                ", password='" + password + '\'' +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", role=" + role +
+                ", carNumber='" + carNumber + '\'' +
+                ", count=" + count +
+                ", parkingFine=" + parkingFine +
+                '}';
     }
 }

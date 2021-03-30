@@ -1,12 +1,15 @@
 package org.example.tomasBarauskas.service.parkingStatisticService;
 
-import org.example.tomasBarauskas.model.parking.ParkingTicket;
+import org.example.tomasBarauskas.model.parking.parkingRecord.ParkingTicket;
 import org.example.tomasBarauskas.service.parkingTicketDbManager.ParkingTicketDbManagerImpl;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface ParkingStatisticByGroupsService {
     List<ParkingTicket> allTicketsFromDb = new ParkingTicketDbManagerImpl().getParkingTicketsDb();
 
     List<ParkingTicket> getTicketListByGroup(String parkingDetail);
+
+    List<ParkingTicket> getTicketsListByGroupAndDate(LocalDate dateFrom, LocalDate dateTo, String city);
 }
