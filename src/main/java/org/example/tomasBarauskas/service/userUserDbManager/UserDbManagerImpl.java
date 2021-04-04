@@ -4,26 +4,17 @@ import org.example.tomasBarauskas.exception.userDataBase.NoUserInDbByID;
 import org.example.tomasBarauskas.exception.userDataBase.RegistrationIdAlreadyExist;
 import org.example.tomasBarauskas.exception.userDataBase.WrongLogInPassword;
 import org.example.tomasBarauskas.model.user.User;
-import org.example.tomasBarauskas.util.FileRW;
-import org.example.tomasBarauskas.util.UserFileRW;
+import org.example.tomasBarauskas.util.json.FileJsonRW;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 public class UserDbManagerImpl implements UserDbManager {
-    private final String PATH_USER_DB_FILE = "/Users/Gabi/IdeaProjects/2021-03-10/2021-03-19-ParkingAppDarbas/src/main/java/org/example/tomasBarauskas/file/UserDatabase.ser";
+    private final String PATH_USER_LIST = "target/users.json";
 
-    private FileRW userFileRW = new UserFileRW();
-    private List<User> usersDb = new ArrayList<>();
+    private FileJsonRW jsonRW = new FileJsonRW();
+    private List<User> usersDb = jsonRW.jsonReadUsersFromFile();
 
     public UserDbManagerImpl() {
-        try {
-            usersDb = userFileRW.getDetailsFromFile1(PATH_USER_DB_FILE);
-        } catch (IOException e) {
-            System.out.println("Nepavyko uzkrauti duomenu");
-        }
     }
 
     @Override
@@ -36,7 +27,6 @@ public class UserDbManagerImpl implements UserDbManager {
     @Override
     public void registrationCheckIfIdExist(String checkID) throws RegistrationIdAlreadyExist {
         usersDb = getAllUsers();
-
         for (User user : usersDb) {
             if (user.getUserId().equals(checkID)) {
                 throw new RegistrationIdAlreadyExist();
@@ -46,16 +36,11 @@ public class UserDbManagerImpl implements UserDbManager {
 
     @Override
     public List<User> getAllUsers() {
-        try {
-            usersDb = userFileRW.getDetailsFromFile1(PATH_USER_DB_FILE);
-        } catch (IOException e) {
-            System.out.println("Klaida");
-        }
-        return usersDb;
+        return jsonRW.jsonReadUsersFromFile();
     }
 
     @Override
-    public User logInCheckDetails(String logInID, String logInPassword) throws NoUserInDbByID, WrongLogInPassword{
+    public User logInCheckDetails(String logInID, String logInPassword) throws NoUserInDbByID, WrongLogInPassword {
         User userToCheckPassword = findUserByID(logInID);
         if (userToCheckPassword.getPassword().equals(logInPassword)) {
             return userToCheckPassword;
@@ -64,34 +49,8 @@ public class UserDbManagerImpl implements UserDbManager {
     }
 
     @Override
-    public void putMoneyToUserAccount(User user, float putAmount){
+    public User findUserByID(String idForSearching) throws NoUserInDbByID {
         usersDb = getAllUsers();
-        BigDecimal putAmountBigDecimal = BigDecimal.valueOf(putAmount);
-        BigDecimal amountInUserCount = user.getCount();
-
-        for (User userTemp : usersDb) {
-            if (userTemp.equals(user)) {
-                userTemp.setCount(putAmountBigDecimal.add(amountInUserCount));
-            }
-        }
-        writeUserDbToFile(usersDb);
-    }
-
-    @Override
-    public void changeUserCarNumber(User user, String newCarNumber){
-        usersDb = getAllUsers();
-
-        for (User userTemp : usersDb) {
-            if (userTemp.equals(user)) {
-                userTemp.setCarNumber(newCarNumber);
-            }
-        }
-        writeUserDbToFile(usersDb);
-    }
-
-    private User findUserByID(String idForSearching) throws NoUserInDbByID{
-        usersDb = getAllUsers();
-
         for (User user : usersDb) {
             if (user.getUserId().equals(idForSearching)) {
                 return user;
@@ -100,11 +59,19 @@ public class UserDbManagerImpl implements UserDbManager {
         throw new NoUserInDbByID();
     }
 
-    private void writeUserDbToFile(List<User> userList){
-        try {
-            userFileRW.writeObjectDetailsToFile(PATH_USER_DB_FILE, userList);
-        } catch (IOException e) {
-            System.out.println("Klaida");
+    @Override
+    public void rewriteUserDetailsToFile(User userWithNewDetails) {
+        usersDb = getAllUsers();
+        for (User user : usersDb){
+            if (user.equals(userWithNewDetails)){
+                user.setCarNumber(userWithNewDetails.getCarNumber());
+                user.setCount(userWithNewDetails.getCount());
+                writeUserDbToFile(usersDb);
+            }
         }
+    }
+
+    private void writeUserDbToFile(List<User> userList) {
+        jsonRW.jsonWriteObjectListToFile(userList, PATH_USER_LIST);
     }
 }

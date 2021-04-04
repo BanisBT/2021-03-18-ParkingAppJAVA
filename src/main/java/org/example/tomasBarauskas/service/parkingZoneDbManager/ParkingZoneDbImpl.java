@@ -1,35 +1,22 @@
 package org.example.tomasBarauskas.service.parkingZoneDbManager;
 
 import org.example.tomasBarauskas.model.parking.ParkingZone;
-import org.example.tomasBarauskas.util.FileRW;
-import org.example.tomasBarauskas.util.ParkingZoneFileRW;
+import org.example.tomasBarauskas.util.json.FileJsonRW;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ParkingZoneDbImpl implements ParkingZoneDb {
-    private static final String PATH_ZONE_DB = "/Users/Gabi/IdeaProjects/2021-03-10/2021-03-19-ParkingAppDarbas/src/main/java/org/example/tomasBarauskas/file/ParkingZoneDatabase.ser";
+    private final String PATH_ZONE_LIST = "target/parkingZone.json";
 
-    private FileRW zoneFileRW = new ParkingZoneFileRW();
-    private List<ParkingZone> parkingZoneList = new ArrayList<>();
+    private FileJsonRW jsonRW = new FileJsonRW();
+    private List<ParkingZone> parkingZoneList = jsonRW.jsonReadParkingZoneFromFile();
 
     public ParkingZoneDbImpl() {
-        try {
-            parkingZoneList = zoneFileRW.getDetailsFromFile1(PATH_ZONE_DB);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public List<ParkingZone> getParkingZoneList(){
-        try {
-            parkingZoneList = zoneFileRW.getDetailsFromFile1(PATH_ZONE_DB);
-        } catch (IOException e) {
-            System.out.println("Klaida");
-        }
-        return parkingZoneList;
+        return jsonRW.jsonReadParkingZoneFromFile();
     }
 
     @Override
@@ -49,10 +36,6 @@ public class ParkingZoneDbImpl implements ParkingZoneDb {
     }
 
     private void writeZoneToDb(List zoneList){
-        try {
-            zoneFileRW.writeObjectDetailsToFile(PATH_ZONE_DB, zoneList);
-        } catch (IOException e) {
-            System.out.println("Klaida");
-        }
+        jsonRW.jsonWriteObjectListToFile(zoneList,PATH_ZONE_LIST);
     }
 }

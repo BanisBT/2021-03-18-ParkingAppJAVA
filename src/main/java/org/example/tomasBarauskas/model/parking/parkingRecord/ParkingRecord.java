@@ -1,16 +1,19 @@
 package org.example.tomasBarauskas.model.parking.parkingRecord;
 
 import org.example.tomasBarauskas.model.parking.ParkingZone;
-import org.example.tomasBarauskas.model.parking.parkingCity.ParkingRecordStatus;
+import org.example.tomasBarauskas.model.parking.ParkingRecordStatus;
 import org.example.tomasBarauskas.model.user.User;
 
 import java.io.Serializable;
 
 public class ParkingRecord implements Serializable {
-    private final String parkingCity;
-    private final User regularUser;
-    private final ParkingZone parkingZone;
+    private String parkingCity;
+    private User regularUser;
+    private ParkingZone parkingZone;
     private ParkingRecordStatus recordStatus = ParkingRecordStatus.UNPAID;
+
+    public ParkingRecord() {
+    }
 
     public ParkingRecord(String parkingCity, ParkingZone parkingZone, User user) {
         this.parkingCity = parkingCity;

@@ -1,4 +1,4 @@
-package org.example.tomasBarauskas.model.parking.parkingCity;
+package org.example.tomasBarauskas.model.parking;
 
 public enum ParkingRecordStatus {
     OPEN,

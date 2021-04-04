@@ -1,7 +1,7 @@
 package org.example.tomasBarauskas.factory.parkingFineFactory;
 
 import org.example.tomasBarauskas.exception.finance.NotPaidParkingFine;
-import org.example.tomasBarauskas.model.parking.parkingCity.ParkingRecordStatus;
+import org.example.tomasBarauskas.model.parking.ParkingRecordStatus;
 import org.example.tomasBarauskas.model.parking.parkingRecord.ParkingFine;
 import org.example.tomasBarauskas.model.user.User;
 import org.example.tomasBarauskas.service.parkingFineDbManager.ParkingFineDbManager;

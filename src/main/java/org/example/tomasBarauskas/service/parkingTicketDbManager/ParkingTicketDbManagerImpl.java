@@ -2,61 +2,58 @@ package org.example.tomasBarauskas.service.parkingTicketDbManager;
 
 import org.example.tomasBarauskas.model.parking.parkingRecord.ParkingTicket;
 import org.example.tomasBarauskas.model.user.User;
-import org.example.tomasBarauskas.util.FileRW;
-import org.example.tomasBarauskas.util.ParkingTicketsFileRW;
+import org.example.tomasBarauskas.util.json.FileJsonRW;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class ParkingTicketDbManagerImpl implements ParkingTicketDbManager {
-    private final String PATH_TICKET_DB_FILE = "/Users/Gabi/IdeaProjects/2021-03-10/2021-03-19-ParkingAppDarbas/src/main/java/org/example/tomasBarauskas/file/ParkingTicketDatabase.ser";
+    private final String PATH_TICKET_LIST = "target/parkingTicket.json";
 
-    private FileRW ticketFileRW = new ParkingTicketsFileRW();
-    private static List<ParkingTicket> parkingTickets = new ArrayList<>();
+    private FileJsonRW jsonRW = new FileJsonRW();
+    private List<ParkingTicket> parkingTickets = jsonRW.jsonReadParkingTicketsFromFile();
 
     public ParkingTicketDbManagerImpl() {
-        try {
-            parkingTickets = ticketFileRW.getDetailsFromFile1(PATH_TICKET_DB_FILE);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
     public void addTicketToDb(ParkingTicket parkingTicket) {
-        try {
-            parkingTickets = ticketFileRW.getDetailsFromFile1(PATH_TICKET_DB_FILE);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        parkingTickets = getParkingTicketsDb();
+        parkingTicket.setTicketID(getLastTicketIdInDb() + 1);
         parkingTickets.add(parkingTicket);
-        writeTicketDbToFile();
+        writeTicketsDbToFile(parkingTickets);
     }
 
     @Override
     public List<ParkingTicket> getParkingTicketsDb() {
-        try {
-            parkingTickets = ticketFileRW.getDetailsFromFile1(PATH_TICKET_DB_FILE);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return parkingTickets;
+        return jsonRW.jsonReadParkingTicketsFromFile();
     }
 
     @Override
     public List<ParkingTicket> getAllUsersParkingTickets(User user) {
-       return getParkingTicketsDb().stream()
+        return getParkingTicketsDb().stream()
                 .filter(ticket -> ticket.getRegularUser().equals(user))
                 .collect(Collectors.toList());
     }
 
-    private void writeTicketDbToFile() {
-        try {
-            ticketFileRW.writeObjectDetailsToFile(PATH_TICKET_DB_FILE, parkingTickets);
-        } catch (IOException e) {
-            e.printStackTrace();
+    @Override
+    public void rewriteParkingTicketDetailsToFile(ParkingTicket ticketWithNewDetails) {
+        parkingTickets = getParkingTicketsDb();
+        for (ParkingTicket ticket : parkingTickets) {
+            if (ticket.equals(ticketWithNewDetails)) {
+                ticket.setEndParking(ticketWithNewDetails.getEndParking());
+                ticket.setTicketAmount(ticketWithNewDetails.getTicketAmount());
+                ticket.setRecordStatus(ticketWithNewDetails.getRecordStatus());
+                writeTicketsDbToFile(parkingTickets);
+            }
         }
+    }
+
+    private long getLastTicketIdInDb() {
+        return getParkingTicketsDb().get(getParkingTicketsDb().size() - 1).getTicketID();
+    }
+
+    private void writeTicketsDbToFile(List<ParkingTicket> parkingTicketList) {
+        jsonRW.jsonWriteObjectListToFile(parkingTicketList, PATH_TICKET_LIST);
     }
 }

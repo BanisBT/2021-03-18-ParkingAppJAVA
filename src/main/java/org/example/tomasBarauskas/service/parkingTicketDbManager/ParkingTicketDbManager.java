@@ -12,4 +12,6 @@ public interface ParkingTicketDbManager {
     List<ParkingTicket> getParkingTicketsDb();
 
     List<ParkingTicket> getAllUsersParkingTickets(User user);
+
+    void rewriteParkingTicketDetailsToFile(ParkingTicket ticketWithNewDetails);
 }

@@ -4,6 +4,7 @@ import org.example.tomasBarauskas.exception.finance.InsufficientFunds;
 import org.example.tomasBarauskas.exception.finance.NotPaidParkingFine;
 import org.example.tomasBarauskas.exception.finance.RestoreBalance;
 import org.example.tomasBarauskas.exception.finance.TransferZeroLess;
+import org.example.tomasBarauskas.exception.parkingTicket.TicketError;
 import org.example.tomasBarauskas.exception.parkingTicket.UserDontHaveOpenParkingTicket;
 import org.example.tomasBarauskas.exception.parkingTicket.UserHaveOpenParkingTicket;
 import org.example.tomasBarauskas.exception.userDataBase.NoUserInDbByID;
@@ -11,19 +12,13 @@ import org.example.tomasBarauskas.exception.userDataBase.RegistrationIdAlreadyEx
 import org.example.tomasBarauskas.factory.parkingFineFactory.ParkingFineFactory;
 import org.example.tomasBarauskas.factory.parkingTicketFactory.ParkingTicketFactory;
 import org.example.tomasBarauskas.factory.parkingZoneFactory.ParkingZoneFactory;
+import org.example.tomasBarauskas.factory.statisticFactory.StatisticFactory;
 import org.example.tomasBarauskas.factory.userFactory.UserFinanceFactory;
 import org.example.tomasBarauskas.factory.userFactory.UserLogInFactory;
 import org.example.tomasBarauskas.model.CompanyAccount;
 import org.example.tomasBarauskas.model.parking.parkingCity.*;
 import org.example.tomasBarauskas.model.parking.parkingRecord.ParkingTicket;
-import org.example.tomasBarauskas.model.parking.ParkingTime;
 import org.example.tomasBarauskas.model.parking.ParkingZone;
-import org.example.tomasBarauskas.model.user.UserRole;
-import org.example.tomasBarauskas.service.financeManager.FinanceManager;
-import org.example.tomasBarauskas.service.financeManager.FinanceManagerImpl;
-import org.example.tomasBarauskas.service.parkingStatisticService.ParkingStatisticByCity;
-import org.example.tomasBarauskas.service.parkingStatisticService.ParkingStatisticByGroupsService;
-import org.example.tomasBarauskas.service.parkingStatisticService.ParkingStatisticByZone;
 import org.example.tomasBarauskas.service.parkingTicketDbManager.ParkingTicketDbManager;
 import org.example.tomasBarauskas.service.parkingTicketDbManager.ParkingTicketDbManagerImpl;
 import org.example.tomasBarauskas.service.parkingZoneDbManager.ParkingZoneDb;
@@ -38,33 +33,28 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 public class InputMenu {
 
-    private Scanner sc = new Scanner(System.in);
-    private UserLogInFactory userLogInFactory = new UserLogInFactory();
-    private UserFinanceFactory userFinanceFactory = new UserFinanceFactory();
-    private ParkingZoneFactory parkingZoneFactory = new ParkingZoneFactory();
-    private ParkingFineFactory fineFactory = new ParkingFineFactory();
-    private ParkingTicketFactory ticketFactory = new ParkingTicketFactory();
-    private UserDbManagerImpl userDbManager = new UserDbManagerImpl();
-
-
-    private ParkingZoneDb zoneDb = new ParkingZoneDbImpl();
-    private ParkingTicketDbManager ticketDb = new ParkingTicketDbManagerImpl();
-    private CompanyAccount companyAccount = new CompanyAccount();
-    private FinanceManager financeMng = new FinanceManagerImpl();
-    private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
+    private final Scanner sc = new Scanner(System.in);
+    private final UserLogInFactory userLogInFactory = new UserLogInFactory();
+    private final UserFinanceFactory userFinanceFactory = new UserFinanceFactory();
+    private final ParkingZoneFactory parkingZoneFactory = new ParkingZoneFactory();
+    private final ParkingFineFactory fineFactory = new ParkingFineFactory();
+    private final ParkingTicketFactory ticketFactory = new ParkingTicketFactory();
+    private final StatisticFactory statisticFactory = new StatisticFactory();
+    private final UserDbManagerImpl userDbManager = new UserDbManagerImpl();
+    private final ParkingZoneDb zoneDb = new ParkingZoneDbImpl();
+    private final ParkingTicketDbManager ticketDb = new ParkingTicketDbManagerImpl();
+    private final CompanyAccount companyAccount = new CompanyAccount();
+    private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private final int ZONE_LIST_SIZE = zoneDb.getParkingZoneList().size() - 1;
-
-    private final String PATH_TICKET_DB = "/Users/Gabi/IdeaProjects/2021-03-10/2021-03-19-ParkingAppDarbas/src/main/java/org/example/tomasBarauskas/file/UserDatabase.ser";
-    private final String PATH_USER_DB = "/Users/Gabi/IdeaProjects/2021-03-10/2021-03-19-ParkingAppDarbas/src/main/java/org/example/tomasBarauskas/file/UserDatabase.ser";
-    private final String pathParkingZone = "/Users/Gabi/IdeaProjects/2021-03-10/2021-03-19-ParkingAppDarbas/src/main/java/org/example/tomasBarauskas/file/ParkingZoneDatabase.ser";
+    private final ParkingCity VILNIUS_CITY = new ParkingVilnius();
+    private final ParkingCity KAUNAS_CITY = new ParkingKaunas();
+    private final ParkingCity KLAIPEDA_CITY = new ParkingKlaipeda();
     private final String SING_OUT_REGULAR_USER = "8";
     private final String SING_OUT_MANAGER_USER = "11";
-    private final String EXIT_PROGRAM = "7";
+    private final String EXIT_PROGRAM = "3";
     private final String KLAIPEDA = "Klaipeda";
     private final String VILNIUS = "Vilnius";
     private final String KAUNAS = "Kaunas";
@@ -78,61 +68,6 @@ public class InputMenu {
     public void StartProgram() throws IOException, ClassNotFoundException {
         // Manager ID - Manager Psw - Manager
         // Regular ID - Banis Psw - Banis
-
-//        User tomasRegular = new User("Banis", "Banis", "Tomas", "Barauskas");
-//        User manager = new User("Test", "Test", "Manager", "Manager");
-//        User andrius = new User("Butas", "Geras", "Andrius", "Pavarde");
-//        User andrius1 = new User("Maistas", "Geras", "Andrius", "Pavarde");
-//        User andrius2 = new User("Eina", "Blogas", "Andrius", "Pavarde");
-//        manager.setRole(UserRole.MANAGER_ROLE);
-
-//        dbManager.addUserToDb(tomasRegular);
-//        dbManager.addUserToDb(manager);
-//        dbManager.addUserToDb(andrius);
-//        dbManager.addUserToDb(andrius1);
-//        dbManager.addUserToDb(andrius2);
-
-        ParkingCity vilnius = new ParkingVilnius();
-        ParkingCity kaunas = new ParkingKaunas();
-        ParkingCity klaipeda = new ParkingKlaipeda();
-        LocalDateTime dabar = LocalDateTime.now();
-        LocalDateTime pabaiga = dabar.plusHours(1);
-
-//        ParkingTicket ticket9 = new ParkingTicket(vilnius.getName(), ParkingZone.VILNIUS_BLUE_ZONE, tomasRegular);
-//        ParkingTicket ticket1 = new ParkingTicket(vilnius.getName(), ParkingZone.VILNIUS_RED_ZONE, tomasRegular);
-//        ParkingTicket ticket4 = new ParkingTicket(vilnius.getName(), ParkingZone.VILNIUS_RED_ZONE, andrius);
-//        ParkingTicket ticket5 = new ParkingTicket(vilnius.getName(), ParkingZone.VILNIUS_RED_ZONE, andrius1);
-//        ParkingTicket ticket2 = new ParkingTicket(kaunas.getName(), ParkingZone.KAUNAS_GREEN_ZONE, andrius2);
-//        ParkingTicket ticket6 = new ParkingTicket(kaunas.getName(), ParkingZone.KAUNAS_GREEN_ZONE, andrius1);
-//        ParkingTicket ticket7 = new ParkingTicket(kaunas.getName(), ParkingZone.KAUNAS_BLUE_ZONE, andrius);
-//        ParkingTicket ticket3 = new ParkingTicket(klaipeda.getName(), ParkingZone.KLAIPEDA_RED_ZONE, andrius2);
-//
-//        ticket1.setEndParking(dabar.plusHours(10));
-//        ticket2.setEndParking(dabar.plusHours(3));
-//        ticket3.setEndParking(dabar.plusDays(2));
-//        ticket4.setEndParking(dabar.plusMinutes(45));
-//        ticket5.setEndParking(dabar.plusHours(7));
-//        ticket6.setEndParking(dabar.plusHours(14));
-//        ticket9.setEndParking(dabar.plusMinutes(90));
-//        FinanceManagerImpl financeManagerTest = new FinanceManagerImpl();
-//        BigDecimal ticket1Big = financeManagerTest.getTicketAmount(ticket1.getParkingZone(), ticket1.getBeginParking(), ticket1.getEndParking());
-//        ticket1.setTicketAmount(ticket1Big);
-//        ticket2.setTicketAmount(financeManagerTest.getTicketAmount(ticket2.getParkingZone(), ticket2.getBeginParking(), ticket2.getEndParking()));
-//        ticket3.setTicketAmount(financeManagerTest.getTicketAmount(ticket3.getParkingZone(), ticket3.getBeginParking(), ticket3.getEndParking()));
-//        ticket4.setTicketAmount(financeManagerTest.getTicketAmount(ticket4.getParkingZone(), ticket4.getBeginParking(), ticket4.getEndParking()));
-//        ticket5.setTicketAmount(financeManagerTest.getTicketAmount(ticket4.getParkingZone(), ticket5.getBeginParking(), ticket5.getEndParking()));
-//        ticket6.setTicketAmount(financeManagerTest.getTicketAmount(ticket6.getParkingZone(), ticket6.getBeginParking(), ticket6.getEndParking()));
-//        ticket9.setTicketAmount(financeManagerTest.getTicketAmount(ticket9.getParkingZone(), ticket9.getBeginParking(), ticket9.getEndParking()));
-//        ticket7.setTicketAmount(financeManagerTest.getTicketAmount(ticket7.getParkingZone(), ticket7.getBeginParking(), ticket7.getEndParking()));
-//
-//        ticketDb.addTicketToDb(ticket9);
-//        ticketDb.addTicketToDb(ticket1);
-//        ticketDb.addTicketToDb(ticket2);
-//        ticketDb.addTicketToDb(ticket3);
-//        ticketDb.addTicketToDb(ticket4);
-//        ticketDb.addTicketToDb(ticket5);
-//        ticketDb.addTicketToDb(ticket6);
-//        ticketDb.addTicketToDb(ticket7);
 
         String ivestis = "";
 
@@ -152,22 +87,6 @@ public class InputMenu {
                     }
                     break;
                 case "3":
-                    // zoneDb.getParkingZoneList().forEach(System.out::println);
-                    // userFinanceFactory.getUsersFromFile().forEach(System.out::println);
-                    // userDbManager.getAllUsers().forEach(System.out::println);
-                    System.out.println("=======");
-                    //ticketDb.getParkingTicketsDb().forEach(System.out::println);
-                    break;
-                case "4":
-                    break;
-                case "5":
-                    User manager = new User("Manager", "Manager", "Manager", "Manager");
-                    manager.setRole(UserRole.MANAGER_ROLE);
-                    userDbManager.addUserToDb(manager);
-                    break;
-                case "6":
-                    break;
-                case "7":
                     break;
                 default:
                     System.out.println("Prasome pasirinkti is meniu opciju");
@@ -178,11 +97,7 @@ public class InputMenu {
     private void startMenu() {
         System.out.println("[1] Registruotis");
         System.out.println("[2] Prisijungti prie sistemos");
-        System.out.println("[3] Test in");
-        System.out.println("[4] Test out");
-        System.out.println("[5] Test emun");
-        System.out.println("[6] Test");
-        System.out.println("[7] Iseiti");
+        System.out.println("[3] Iseiti");
     }
 
     private void customerMenu() {
@@ -190,7 +105,7 @@ public class InputMenu {
         System.out.println("[2] Pradeti parkavima");
         System.out.println("[3] Baigti parkavima");
         System.out.println("[4] Isideti pinigu i pinigine");
-        System.out.println("[5] Sumoketi bauda");
+        System.out.println("[5] Baudos");
         System.out.println("[6] Pakeisti masinos numeri");
         System.out.println("[7] Perziureti savo stovejimo talonu istorija");
         System.out.println("[8] Atsijungti");
@@ -201,9 +116,8 @@ public class InputMenu {
         System.out.println("[2] Talonai pagal miestus");
         System.out.println("[3] Talonai pagal zonas");
         System.out.println("[4] Talonai pagal dienas");
-        System.out.println("[5] Bendra"); // kiekiai pagal miestus, zonas, suma, vidurkis
-        System.out.println("[7] Talonu kiekis ir vidurkis pagal miesta");
-        System.out.println("[7] Talonu kiekis ir vidurkis pagal zona");
+        System.out.println("[5] Talonu kiekis ir vidurkis pagal miesta");
+        System.out.println("[6] Talonu kiekis ir vidurkis pagal zona");
         System.out.println("[7] Apmoketu/Neapmoketu baudu ataskaita");
         System.out.println("[8] Pakeisti valandos ikaini");
         System.out.println("[9] Pakeisti baudos dydi");
@@ -263,6 +177,8 @@ public class InputMenu {
 
     private void regularUserFunctionality(User user) throws IOException, ClassNotFoundException {
         String ivestis = "";
+        checkIfUserHaveOpenParkingFine(user);
+
         while (!ivestis.equals(SING_OUT_REGULAR_USER)) {
             customerMenu();
             ivestis = sc.nextLine();
@@ -275,7 +191,7 @@ public class InputMenu {
                     beganParking(user);
                     break;
                 case "3":
-                    // baigti parkavima
+                    endParking(user);
                     break;
                 case "4":
                     putMoneyInToAccount(user);
@@ -287,7 +203,7 @@ public class InputMenu {
                     changeCarNumber(user);
                     break;
                 case "7":
-                    // perziureti savo talonus
+                    getUserAllParkingTickets(user);
                     break;
                 case "8":
                     break;
@@ -306,16 +222,16 @@ public class InputMenu {
 
             switch (ivestis) {
                 case "1":
-                    System.out.println("Imones saskaitoje siuo mentu yra:" + companyAccount.getCompanyAccount());
+                    System.out.println(companyAccount);
                     break;
                 case "2":
-                    getCityForStatistic();
+                    statisticByDateAndCity();
                     break;
                 case "3":
-                    getZoneForStatistic();
+                    statisticByDateAndZone();
                     break;
                 case "4":
-                    // talonai pagal dienas
+                    getStatisticByDate();
                     break;
                 case "5":
                     // ataskaita pagal miestus
@@ -366,7 +282,8 @@ public class InputMenu {
     private void changeCarNumber(User user) {
         System.out.println("Kokie nauji Jusu automobilio numeriai");
         String carNumberToChange = sc.nextLine();
-        userDbManager.changeUserCarNumber(user, carNumberToChange);
+        user.setCarNumber(carNumberToChange);
+        userDbManager.rewriteUserDetailsToFile(user);
     }
 
     private void singUpManager() {
@@ -467,8 +384,8 @@ public class InputMenu {
     private void endParking(User user) {
         try {
             ticketFactory.checkEndUserOpenTicket(user);
-
-        } catch (UserDontHaveOpenParkingTicket e) {
+            ticketFactory.stopParkingTimeAndTryToPayForTicket(user);
+        } catch (UserDontHaveOpenParkingTicket | TicketError e) {
             System.out.println("Jus neturi aktyviu parkavimo talonu");
         }
     }
@@ -476,26 +393,22 @@ public class InputMenu {
     private ParkingCity chooseCityForParking() {
         String pasirinmimas = "";
         boolean wrongChoose = true;
-        String cityName = "";
 
         while (wrongChoose) {
             printCities();
             pasirinmimas = sc.nextLine();
 
             if (pasirinmimas.equals("1")) {
-                ParkingCity vilnius = new ParkingVilnius();
                 wrongChoose = false;
-                return vilnius;
+                return VILNIUS_CITY;
             }
             if (pasirinmimas.equals("2")) {
-                ParkingCity kaunas = new ParkingKaunas();
                 wrongChoose = false;
-                return kaunas;
+                return KAUNAS_CITY;
             }
             if (pasirinmimas.equals("3")) {
-                ParkingCity klaipeda = new ParkingKlaipeda();
                 wrongChoose = false;
-                return klaipeda;
+                return KLAIPEDA_CITY;
             }
             System.out.println("Galima pasirinkti tik is isvardintu miestu");
         }
@@ -537,11 +450,10 @@ public class InputMenu {
         return chosenZone;
     }
 
-    private ParkingTime chooseParkingTime() {
+    private LocalDateTime chooseParkingTime() {
         String pasirinkimas = "";
         boolean wrongChoose = true;
-        ParkingTime parkingTime = null;
-        // LocalDateTime parkingTimePay = LocalDateTime.now();
+        LocalDateTime ticketParkingTime = LocalDateTime.now();
 
         while (wrongChoose) {
             System.out.println("[1] Moketi uz 30min");
@@ -551,18 +463,15 @@ public class InputMenu {
 
             switch (pasirinkimas) {
                 case "1":
-                    parkingTime = ParkingTime.HALF_HOUR;
-                    // parkingTimePay = parkingTimePay.plusMinutes(30);
+                    ticketParkingTime = ticketParkingTime.plusMinutes(30);
                     wrongChoose = false;
                     break;
                 case "2":
-                    parkingTime = ParkingTime.ONE_HOUR;
-                    // parkingTimePay = parkingTimePay.plusHours(1);
+                    ticketParkingTime = ticketParkingTime.plusHours(1);
                     wrongChoose = false;
                     break;
                 case "3":
-                    parkingTime = ParkingTime.TWO_HOUR;
-                    // parkingTimePay = parkingTimePay.plusHours(2);
+                    ticketParkingTime = ticketParkingTime.plusHours(2);
                     wrongChoose = false;
                     break;
                 default:
@@ -570,33 +479,24 @@ public class InputMenu {
                     break;
             }
         }
-        return parkingTime;
+        return ticketParkingTime;
     }
 
     private void parkingMachine(User user) {
         ParkingCity parkingCity = chooseCityForParking();
         ParkingZone parkingZone = chooseZoneForParking(parkingCity);
-        ParkingTime parkingTime = chooseParkingTime();
-
-        LocalDateTime now = LocalDateTime.now();
-        if (parkingTime.equals(ParkingTime.HALF_HOUR)) now = now.plusMinutes(30);
-        if (parkingTime.equals(ParkingTime.ONE_HOUR)) now = now.plusHours(1);
-        if (parkingTime.equals(ParkingTime.TWO_HOUR)) now = now.plusHours(2);
+        LocalDateTime parkingTime = chooseParkingTime();
 
         try {
-            financeMng.checkIfEnoughMoneyInUserAccountForParkingTicket(parkingZone, LocalDateTime.now(), now, user);
-            ParkingTicket tempTicket = new ParkingTicket(parkingCity.getName(), parkingZone, user);
-            tempTicket.setEndParking(now);
-            tempTicket.setRecordStatus(ParkingRecordStatus.PAID);
-            financeMng.chargeMoneyForParking(tempTicket, user, companyAccount);
+            ticketFactory.parkingMachineTryToOrderParkingTicket(user, parkingCity, parkingZone, parkingTime);
         } catch (InsufficientFunds e) {
             System.out.println("Nepakanka lesu sumoketi uz stovejima");
         }
     }
 
-    private void getCityForStatistic() {
-        LocalDate dateFrom = getDateForStatistic("pradzios");
-        LocalDate dateTo = getDateForStatistic("pabaigos");
+    private void statisticByDateAndCity() {
+        LocalDate dateFrom = getDateForStatistic("pradzios", LocalDate.now().minusYears(50));
+        LocalDate dateTo = getDateForStatistic("pabaigos", dateFrom);
 
         String pasirinkimas = "";
         System.out.println("Pagal koki miesta norite gauti parkavimo talonu statistika");
@@ -605,14 +505,13 @@ public class InputMenu {
 
         switch (pasirinkimas) {
             case "1":
-                testStatistic(dateFrom, dateTo, VILNIUS);
-                // ticketsByCity(dateFrom, dateTo, VILNIUS);
+                getStatisticByDateAndCity(dateFrom, dateTo, VILNIUS);
                 break;
             case "2":
-                ticketsByCity(dateFrom, dateTo, KAUNAS);
+                getStatisticByDateAndCity(dateFrom, dateTo, KAUNAS);
                 break;
             case "3":
-                ticketsByCity(dateFrom, dateTo, KLAIPEDA);
+                getStatisticByDateAndCity(dateFrom, dateTo, KLAIPEDA);
                 break;
             default:
                 System.out.println("Pasirinkime yra tik isvardinti miestai");
@@ -620,20 +519,10 @@ public class InputMenu {
         }
     }
 
-    private void orderParking(User user) {
+    private void statisticByDateAndZone() {
+        LocalDate dateFrom = getDateForStatistic("pradzios", LocalDate.now().minusYears(50));
+        LocalDate dateTo = getDateForStatistic("pabaigos", dateFrom);
 
-    }
-
-    private void ticketsByZone1(String zoneName) {
-        ParkingStatisticByGroupsService statisticMgn = new ParkingStatisticByZone();
-        List<ParkingTicket> ticketsByZone = statisticMgn.getTicketListByGroup(zoneName);
-
-        for (ParkingTicket ticket : ticketsByZone) {
-            System.out.println(ticket);
-        }
-    }
-
-    private void getZoneForStatistic() {
         String pasirinkimas = "";
         System.out.println("Pagal koke zona norite gauti parkavimo talonu statistika");
         printZones();
@@ -641,13 +530,13 @@ public class InputMenu {
 
         switch (pasirinkimas) {
             case "1":
-                ticketsByZone1(GREEN_ZONE);
+                getStatisticByDateAndZone(dateFrom, dateTo, GREEN_ZONE);
                 break;
             case "2":
-                ticketsByZone1(RED_ZONE);
+                getStatisticByDateAndZone(dateFrom, dateTo, RED_ZONE);
                 break;
             case "3":
-                ticketsByZone1(BLUE_ZONE);
+                getStatisticByDateAndZone(dateFrom, dateTo, BLUE_ZONE);
                 break;
             default:
                 System.out.println("Galimi zonu pasirininkimai tik is pateiktu");
@@ -655,42 +544,69 @@ public class InputMenu {
         }
     }
 
-    private void ticketsByCity(LocalDate dateFrom, LocalDate dateTo, String city) {
-        List<ParkingTicket> filteredTicketList = ticketDb.getParkingTicketsDb().stream()
-                .filter(ticket -> ticket.getBeginParking().toLocalDate().isAfter(dateFrom.minusDays(1)))
-                .filter(ticket -> ticket.getEndParking().toLocalDate().isBefore(dateTo.plusDays(1)))
-                .filter(ticket -> ticket.getParkingCity().equals(city))
-                .collect(Collectors.toList());
+    private void getStatisticByDateAndZone(LocalDate dateFrom, LocalDate dateTo, String zone) {
+        List<ParkingTicket> ticketsSortedByDateAndZone = statisticFactory.getParkingTicketsSortByDateAndZone(dateFrom, dateTo, zone);
+        printListOfParkingTickets(ticketsSortedByDateAndZone);
+    }
 
-        if (filteredTicketList.isEmpty()) {
+    private void getStatisticByDateAndCity(LocalDate dateFrom, LocalDate dateTo, String city) {
+        List<ParkingTicket> ticketsSortedByDateAndCity = statisticFactory.getParkingTicketsSortByDateAndCity(dateFrom, dateTo, city);
+        printListOfParkingTickets(ticketsSortedByDateAndCity);
+    }
+
+    private void getUserAllParkingTickets(User user){
+        List<ParkingTicket> userParkingTickets = ticketDb.getAllUsersParkingTickets(user);
+        if (userParkingTickets.isEmpty()){
             System.out.println("Pagal uzklausa talonu nerasta");
         } else {
-            filteredTicketList.forEach(System.out::println);
+            userParkingTickets.forEach(ticket -> System.out.println(ticket.toStringForUserViewTickets()));
         }
     }
 
-    private LocalDate getDateForStatistic(String endOrBegan) {
-        System.out.println("Iveskite " + endOrBegan + " laika (Formatas yyyy-MM-dd)");
-        String dateForStatisticString = sc.nextLine();
+    private void printListOfParkingTickets(List<ParkingTicket> parkingTicketList){
+        if (parkingTicketList.isEmpty()){
+            System.out.println("Pagal uzklausa talonu nerasta");
+        } else {
+            parkingTicketList.forEach(ticket -> System.out.println(ticket.toStringForStatistic()));
+        }
+    }
+
+    private LocalDate getDateForStatistic(String endOrBegan, LocalDate beganDate) {
+        boolean goodDate = true;
         LocalDate dateForStatistic = null;
 
-        try {
-            dateForStatistic = LocalDate.parse(dateForStatisticString, dtf);
-        } catch (DateTimeParseException e) {
-            System.out.println("Blogai ivesta data, teisingas datos ivedimo pvz 2021-02-14");
+        while (goodDate) {
+            System.out.println("Iveskite " + endOrBegan + " laika (Formatas yyyy-MM-dd)");
+            String dateForStatisticString = sc.nextLine();
+
+            try {
+                dateForStatistic = LocalDate.parse(dateForStatisticString, dtf);
+                if (beganDate.minusDays(1).isBefore(dateForStatistic)) {
+                    goodDate = false;
+                } else {
+                    System.out.println("Data negali buti ankstene negu " + beganDate);
+                }
+
+            } catch (DateTimeParseException e) {
+                System.out.println("Blogai ivesta data, teisingas datos ivedimo pvz 2021-02-14");
+            }
         }
         return dateForStatistic;
     }
 
-    private void testStatistic(LocalDate dateFrom, LocalDate dateTo, String city) {
-        ParkingStatisticByGroupsService statisticMng = new ParkingStatisticByCity();
-        List<ParkingTicket> ticketList = statisticMng.getTicketsListByGroupAndDate(dateFrom, dateTo, city);
+    private void getStatisticByDate() {
+        LocalDate beganDate = getDateForStatistic("pradzios", LocalDate.now().minusYears(10));
+        LocalDate endDate = getDateForStatistic("pabaigos", beganDate);
 
-        if (ticketList.isEmpty()) {
-            System.out.println("Nera talonu");
-        } else {
-            ticketList.forEach(System.out::println);
+        List<ParkingTicket> testParkingTicketSortByDate = statisticFactory.getParkingTicketsSortByDate(beganDate, endDate);
+        testParkingTicketSortByDate.forEach(ticket -> System.out.println(ticket.toStringForStatistic()));
+    }
+
+    private void checkIfUserHaveOpenParkingFine(User user){
+        try {
+            fineFactory.checkForUserUnpaidParkingFine(user);
+        } catch (NotPaidParkingFine e) {
+            System.out.println("Jus gavote stovejimo nuobauda, ja apmoketi galite pasirinkus skilti \"Baudos\"");
         }
     }
 }
-

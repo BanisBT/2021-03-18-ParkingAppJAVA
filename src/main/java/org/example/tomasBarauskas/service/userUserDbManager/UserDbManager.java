@@ -17,7 +17,7 @@ public interface UserDbManager {
 
     User logInCheckDetails(String logInID, String logInPassword) throws NoUserInDbByID, WrongLogInPassword, IOException, ClassNotFoundException;
 
-    void putMoneyToUserAccount(User user, float amount) throws IOException, ClassNotFoundException, NoUserInDbByID;
+    User findUserByID(String id) throws NoUserInDbByID;
 
-    void changeUserCarNumber(User user, String newCarNumber) throws IOException, ClassNotFoundException;
+    void rewriteUserDetailsToFile(User userWithNewDetails);
 }

@@ -1,4 +1,4 @@
-package org.example.tomasBarauskas.util;
+package org.example.tomasBarauskas.util.file_rw;
 
 import org.example.tomasBarauskas.model.parking.ParkingZone;
 
@@ -9,7 +9,7 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParkingZoneFileRW implements FileRW{
+public class ParkingZoneFileRW implements FileRW {
 
     @Override
     public List getDetailsFromFile1(String path) throws IOException {

@@ -44,4 +44,3 @@ public class UserLogInFactory {
         return user.getRole().equals(UserRole.REGULAR_ROLE);
     }
 }
-

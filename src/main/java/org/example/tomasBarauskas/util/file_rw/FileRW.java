@@ -1,11 +1,11 @@
-package org.example.tomasBarauskas.util;
+package org.example.tomasBarauskas.util.file_rw;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-public interface FileRW<E extends Object> {
+public interface FileRW<E> {
 
     default void writeObjectDetailsToFile(String path, List<E> list) throws IOException {
         FileOutputStream fos = new FileOutputStream(path);

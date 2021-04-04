@@ -1,0 +1,55 @@
+[ {
+  "userId" : "Banis",
+  "password" : "Banis",
+  "name" : "Tomas",
+  "surname" : "Barauskas",
+  "role" : "REGULAR_ROLE",
+  "carNumber" : "rty 000",
+  "count" : 616.07,
+  "parkingFine" : null
+}, {
+  "userId" : "Test",
+  "password" : "Test",
+  "name" : "Manager",
+  "surname" : "Manager",
+  "role" : "MANAGER_ROLE",
+  "carNumber" : "xxx 999",
+  "count" : 0,
+  "parkingFine" : null
+}, {
+  "userId" : "Butas",
+  "password" : "Geras",
+  "name" : "Andrius",
+  "surname" : "Pavarde",
+  "role" : "REGULAR_ROLE",
+  "carNumber" : "xxx 999",
+  "count" : 0,
+  "parkingFine" : null
+}, {
+  "userId" : "Maistas",
+  "password" : "Geras",
+  "name" : "Andrius",
+  "surname" : "Pavarde",
+  "role" : "REGULAR_ROLE",
+  "carNumber" : "xxx 999",
+  "count" : 0,
+  "parkingFine" : null
+}, {
+  "userId" : "Eina",
+  "password" : "Blogas",
+  "name" : "Andrius",
+  "surname" : "Pavarde",
+  "role" : "REGULAR_ROLE",
+  "carNumber" : "xxx 999",
+  "count" : 0,
+  "parkingFine" : null
+}, {
+  "userId" : "Lopas",
+  "password" : "Lopas",
+  "name" : "Lopas",
+  "surname" : "Lopas",
+  "role" : "REGULAR_ROLE",
+  "carNumber" : "Lopas",
+  "count" : 0,
+  "parkingFine" : null
+} ]

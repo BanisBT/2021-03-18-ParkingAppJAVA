@@ -1,4 +1,4 @@
-package org.example.tomasBarauskas.util;
+package org.example.tomasBarauskas.util.file_rw;
 
 import org.example.tomasBarauskas.model.parking.parkingRecord.ParkingTicket;
 
@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParkingTicketsFileRW implements FileRW{
+public class ParkingTicketsFileRW implements FileRW {
 
     @Override
     public List getDetailsFromFile1(String path) throws IOException {

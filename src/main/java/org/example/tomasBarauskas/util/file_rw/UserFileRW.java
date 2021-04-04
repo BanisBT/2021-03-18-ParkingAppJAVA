@@ -1,4 +1,4 @@
-package org.example.tomasBarauskas.util;
+package org.example.tomasBarauskas.util.file_rw;
 
 import org.example.tomasBarauskas.model.user.User;
 

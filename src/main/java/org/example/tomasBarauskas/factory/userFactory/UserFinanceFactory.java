@@ -18,12 +18,11 @@ public class UserFinanceFactory {
         if (amount < 0) {
             throw new TransferZeroLess();
         } else {
-            try {
-                userDbManager.putMoneyToUserAccount(user, amount);
-            } catch (IOException | ClassNotFoundException | NoUserInDbByID e) {
-                System.out.println("Klaida");
+            BigDecimal putAmountBigDecimal = BigDecimal.valueOf(amount);
+            BigDecimal amountInUserCount = user.getCount();
+            user.setCount(putAmountBigDecimal.add(amountInUserCount));
+            userDbManager.rewriteUserDetailsToFile(user);
             }
-        }
     }
 
     public BigDecimal getUserBalance(User user) throws IOException, ClassNotFoundException {

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class ParkingFine extends ParkingRecord {
-    private static long counter = 0;
+    private static long counter = 500;
 
     private final long fineID;
     private final LocalDateTime fineDateTime;
@@ -18,6 +18,11 @@ public class ParkingFine extends ParkingRecord {
         super(parkingCity, parkingZone, user);
         this.fineID = counter++;
         this.fineDateTime = fineDateTime;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return fineID == ((ParkingFine) obj).fineID;
     }
 
     @Override
