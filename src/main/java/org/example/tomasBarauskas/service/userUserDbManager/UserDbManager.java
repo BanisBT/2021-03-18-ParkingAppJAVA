@@ -20,4 +20,6 @@ public interface UserDbManager {
     User findUserByID(String id) throws NoUserInDbByID;
 
     void rewriteUserDetailsToFile(User userWithNewDetails);
+
+    User findUserByCarNumber(String carNumber);
 }

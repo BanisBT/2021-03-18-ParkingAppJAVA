@@ -71,6 +71,17 @@ public class UserDbManagerImpl implements UserDbManager {
         }
     }
 
+    @Override
+    public User findUserByCarNumber(String carNumber) {
+        usersDb = getAllUsers();
+        for (User user : usersDb){
+            if (carNumber.equals(user.getCarNumber())){
+                return user;
+            }
+        }
+        return null;
+    }
+
     private void writeUserDbToFile(List<User> userList) {
         jsonRW.jsonWriteObjectListToFile(userList, PATH_USER_LIST);
     }

@@ -12,4 +12,6 @@ public interface ParkingFineDbManager {
     List<ParkingFine> getParkingFinesDb();
 
     List<ParkingFine> getUsersParkingFines(User user);
+
+    void probabilityGetParkingFineFromController();
 }

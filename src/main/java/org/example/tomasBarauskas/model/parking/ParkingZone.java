@@ -44,18 +44,18 @@ public enum ParkingZone implements Nameable, Serializable {
         this.fine = fine;
     }
 
-    @Override
-    public String toString() {
-        return "Parkavimo zona - " + super.toString() +
-                " kaina: " + costPerHour +
-                " baudos dydis: " + fine + "Eur";
-    }
-
     public String toStringForPerHourPriceChange() {
         return name + " valandine kaina yra " + costPerHour + " Eur";
     }
 
     public String toStringForFinePriceChange() {
         return name + " baudos dydis yra " + fine + " Eur";
+    }
+
+    @Override
+    public String toString() {
+        return "Parkavimo zona - " + super.toString() +
+                " kaina: " + costPerHour +
+                " baudos dydis: " + fine + "Eur";
     }
 }

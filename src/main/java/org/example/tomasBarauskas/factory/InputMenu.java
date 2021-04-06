@@ -19,6 +19,8 @@ import org.example.tomasBarauskas.model.CompanyAccount;
 import org.example.tomasBarauskas.model.parking.parkingCity.*;
 import org.example.tomasBarauskas.model.parking.parkingRecord.ParkingTicket;
 import org.example.tomasBarauskas.model.parking.ParkingZone;
+import org.example.tomasBarauskas.service.parkingFineDbManager.ParkingFineDbManager;
+import org.example.tomasBarauskas.service.parkingFineDbManager.ParkingFineDbManagerImpl;
 import org.example.tomasBarauskas.service.parkingTicketDbManager.ParkingTicketDbManager;
 import org.example.tomasBarauskas.service.parkingTicketDbManager.ParkingTicketDbManagerImpl;
 import org.example.tomasBarauskas.service.parkingZoneDbManager.ParkingZoneDb;
@@ -46,9 +48,10 @@ public class InputMenu {
     private final UserDbManagerImpl userDbManager = new UserDbManagerImpl();
     private final ParkingZoneDb zoneDb = new ParkingZoneDbImpl();
     private final ParkingTicketDbManager ticketDb = new ParkingTicketDbManagerImpl();
+    private final ParkingFineDbManager fineDbManager = new ParkingFineDbManagerImpl();
     private final CompanyAccount companyAccount = new CompanyAccount();
     private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private final int ZONE_LIST_SIZE = zoneDb.getParkingZoneList().size() - 1;
+    private final int ZONE_LIST_SIZE = zoneDb.getParkingZoneList().size();
     private final ParkingCity VILNIUS_CITY = new ParkingVilnius();
     private final ParkingCity KAUNAS_CITY = new ParkingKaunas();
     private final ParkingCity KLAIPEDA_CITY = new ParkingKlaipeda();
@@ -68,7 +71,7 @@ public class InputMenu {
     public void StartProgram() throws IOException, ClassNotFoundException {
         // Manager ID - Manager Psw - Manager
         // Regular ID - Banis Psw - Banis
-
+        fineDbManager.probabilityGetParkingFineFromController();
         String ivestis = "";
 
         while (!ivestis.equals(EXIT_PROGRAM)) {
